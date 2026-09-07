@@ -211,29 +211,30 @@ local function ToggleAll(select)
     UpdateStatus()
 end
 
--- === ANTI-FLING (делает игрока несталкиваемым) ===
+-- === ANTI-FLING (отключает коллизию с игроками, НЕ с миром) ===
 local antiFlingEnabled = false
 local antiFlingConnections = {}
+local antiFlingParts = {}
 
 local function ToggleAntiFling(state)
     antiFlingEnabled = state
     if antiFlingEnabled then
-        -- Отключаем коллизию у всех частей персонажа
         local char = plr.Character
         if char then
             for _, part in pairs(char:GetDescendants()) do
                 if part:IsA("BasePart") then
                     part.CanCollide = false
+                    table.insert(antiFlingParts, part)
                 end
             end
         end
         
-        -- Следим за новыми частями
         antiFlingConnections.CharacterAdded = plr.CharacterAdded:Connect(function(char)
             task.wait(0.5)
             for _, part in pairs(char:GetDescendants()) do
                 if part:IsA("BasePart") then
                     part.CanCollide = false
+                    table.insert(antiFlingParts, part)
                 end
             end
         end)
@@ -242,11 +243,11 @@ local function ToggleAntiFling(state)
             char.DescendantAdded:Connect(function(part)
                 if antiFlingEnabled and part:IsA("BasePart") then
                     part.CanCollide = false
+                    table.insert(antiFlingParts, part)
                 end
             end)
         end)
     else
-        -- Восстанавливаем коллизию
         local char = plr.Character
         if char then
             for _, part in pairs(char:GetDescendants()) do
@@ -256,11 +257,11 @@ local function ToggleAntiFling(state)
             end
         end
         
-        -- Отключаем все подключения
         for _, conn in pairs(antiFlingConnections) do
             conn:Disconnect()
         end
         antiFlingConnections = {}
+        antiFlingParts = {}
     end
 end
 
@@ -523,7 +524,7 @@ noclipBtn.MouseButton1Click:Connect(function()
     noclipBtn.BackgroundColor3 = noclipEnabled and Color3.fromRGB(80, 30, 120) or Color3.fromRGB(40, 20, 60)
 end)
 
--- Noclip logic
+-- Noclip logic (отключает коллизию со ВСЕМ, включая мир)
 RunService.Stepped:Connect(function()
     if noclipEnabled then
         local char = plr.Character
@@ -537,15 +538,6 @@ RunService.Stepped:Connect(function()
     end
 end)
 
--- Noclip via E key
-UIS.InputBegan:Connect(function(input, gpe)
-    if gpe then return end
-    if input.KeyCode == Enum.KeyCode.E then
-        noclipEnabled = not noclipEnabled
-        noclipBtn.Text = noclipEnabled and "🚶 NOCLIP: ON" or "🚶 NOCLIP: OFF"
-        noclipBtn.BackgroundColor3 = noclipEnabled and Color3.fromRGB(80, 30, 120) or Color3.fromRGB(40, 20, 60)
-    end
-end)
 
 -- Initialize
 UpdatePlayerList()
