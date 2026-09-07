@@ -408,7 +408,7 @@ stopBtn.MouseButton1Click:Connect(StopFling)
 local selAllBtn = Instance.new("TextButton", contentFrame)
 selAllBtn.Size = UDim2.new(0.44, 0, 0, 32)
 selAllBtn.Position = UDim2.new(0.05, 0, 0, btnY + 48)
-selAllBtn.Text = "✓ SELECT ALL"
+selAllBtn.Text = "✅ SELECT ALL"
 selAllBtn.Font = Enum.Font.Gotham
 selAllBtn.TextSize = 13
 selAllBtn.BackgroundColor3 = Color3.fromRGB(50, 25, 65)
@@ -422,7 +422,7 @@ selAllBtn.MouseButton1Click:Connect(function() ToggleAll(true) end)
 local desAllBtn = Instance.new("TextButton", contentFrame)
 desAllBtn.Size = UDim2.new(0.44, 0, 0, 32)
 desAllBtn.Position = UDim2.new(0.51, 0, 0, btnY + 48)
-desAllBtn.Text = "✕ DESELECT ALL"
+desAllBtn.Text = "❌ DESELECT ALL"
 desAllBtn.Font = Enum.Font.Gotham
 desAllBtn.TextSize = 13
 desAllBtn.BackgroundColor3 = Color3.fromRGB(50, 25, 65)
@@ -469,9 +469,9 @@ end)
 UIS.InputBegan:Connect(function(input, gpe)
     if gpe then return end
     if input.KeyCode == Enum.KeyCode.E then
-        noclipEnabled = not noclipEnabled
-        noclipBtn.Text = noclipEnabled and "🚶 NOCLIP: ON" or "🚶 NOCLIP: OFF"
-        noclipBtn.BackgroundColor3 = noclipEnabled and Color3.fromRGB(80, 30, 120) or Color3.fromRGB(40, 20, 60)
+       -- noclipEnabled = not noclipEnabled
+       -- noclipBtn.Text = noclipEnabled and "🚶 NOCLIP: ON" or "🚶 NOCLIP: OFF"
+        --noclipBtn.BackgroundColor3 = noclipEnabled and Color3.fromRGB(80, 30, 120) or Color3.fromRGB(40, 20, 60)
     end
 end)
 
