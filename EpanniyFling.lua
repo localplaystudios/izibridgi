@@ -173,7 +173,7 @@ local function UpdatePlayerList()
                     checkmark.Text = ""
                 else
                     SelectedTargets[player.Name] = player
-                    checkmark.Text = "✓"
+                    checkmark.Text = "✅"
                 end
                 UpdateStatus()
             end)
