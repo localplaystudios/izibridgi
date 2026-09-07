@@ -5,7 +5,7 @@ local UIS = game:GetService("UserInputService")
 local plr = Players.LocalPlayer
 
 local gui = Instance.new("ScreenGui", game.CoreGui)
-gui.Name = "EppaniyFly"..math.random(1,999999999999)
+gui.Name = "EppaniyFly"
 
 -- Главный фрейм
 local frame = Instance.new("Frame", gui)
