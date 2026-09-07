@@ -8,7 +8,7 @@ gui.Name = "EpanniyFling"..math.random(1,9999999)
 
 -- Main Container
 local mainContainer = Instance.new("Frame", gui)
-mainContainer.Size = UDim2.new(0, 340, 0, 320)
+mainContainer.Size = UDim2.new(0, 340, 0, 360)
 mainContainer.Position = UDim2.new(0.3, 0, 0.3, 0)
 mainContainer.BackgroundTransparency = 1
 mainContainer.Active = true
@@ -78,7 +78,7 @@ minimizeBtn.MouseButton1Click:Connect(function()
     if isMinimized then
         mainContainer.Size = UDim2.new(0, 340, 0, 35)
     else
-        mainContainer.Size = UDim2.new(0, 340, 0, 320)
+        mainContainer.Size = UDim2.new(0, 340, 0, 360)
     end
 end)
 
@@ -211,7 +211,60 @@ local function ToggleAll(select)
     UpdateStatus()
 end
 
--- FLING FUNCTION (from KILASIK)
+-- === ANTI-FLING (делает игрока несталкиваемым) ===
+local antiFlingEnabled = false
+local antiFlingConnections = {}
+
+local function ToggleAntiFling(state)
+    antiFlingEnabled = state
+    if antiFlingEnabled then
+        -- Отключаем коллизию у всех частей персонажа
+        local char = plr.Character
+        if char then
+            for _, part in pairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end
+        
+        -- Следим за новыми частями
+        antiFlingConnections.CharacterAdded = plr.CharacterAdded:Connect(function(char)
+            task.wait(0.5)
+            for _, part in pairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+        end)
+        
+        antiFlingConnections.DescendantAdded = plr.CharacterAdded:Connect(function(char)
+            char.DescendantAdded:Connect(function(part)
+                if antiFlingEnabled and part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end)
+        end)
+    else
+        -- Восстанавливаем коллизию
+        local char = plr.Character
+        if char then
+            for _, part in pairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = true
+                end
+            end
+        end
+        
+        -- Отключаем все подключения
+        for _, conn in pairs(antiFlingConnections) do
+            conn:Disconnect()
+        end
+        antiFlingConnections = {}
+    end
+end
+
+-- === FLING FUNCTION (from KILASIK) ===
 local function SkidFling(TargetPlayer)
     local Character = plr.Character
     local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
@@ -432,10 +485,29 @@ daCorner.CornerRadius = UDim.new(0, 8)
 
 desAllBtn.MouseButton1Click:Connect(function() ToggleAll(false) end)
 
--- Noclip toggle (keeping it from original)
+-- Anti-Fling Button
+local antiFlingBtn = Instance.new("TextButton", contentFrame)
+antiFlingBtn.Size = UDim2.new(0.92, 0, 0, 32)
+antiFlingBtn.Position = UDim2.new(0.04, 0, 0, btnY + 88)
+antiFlingBtn.Text = "🛡️ ANTI-FLING: OFF"
+antiFlingBtn.Font = Enum.Font.GothamBold
+antiFlingBtn.TextSize = 14
+antiFlingBtn.BackgroundColor3 = Color3.fromRGB(40, 20, 60)
+antiFlingBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+local afCorner = Instance.new("UICorner", antiFlingBtn)
+afCorner.CornerRadius = UDim.new(0, 10)
+
+antiFlingBtn.MouseButton1Click:Connect(function()
+    local newState = not antiFlingEnabled
+    ToggleAntiFling(newState)
+    antiFlingBtn.Text = newState and "🛡️ ANTI-FLING: ON" or "🛡️ ANTI-FLING: OFF"
+    antiFlingBtn.BackgroundColor3 = newState and Color3.fromRGB(80, 30, 120) or Color3.fromRGB(40, 20, 60)
+end)
+
+-- Noclip toggle
 local noclipBtn = Instance.new("TextButton", contentFrame)
 noclipBtn.Size = UDim2.new(0.92, 0, 0, 30)
-noclipBtn.Position = UDim2.new(0.04, 0, 0, btnY + 88)
+noclipBtn.Position = UDim2.new(0.04, 0, 0, btnY + 128)
 noclipBtn.Text = "🚶 NOCLIP: OFF"
 noclipBtn.Font = Enum.Font.GothamBold
 noclipBtn.TextSize = 14
@@ -469,9 +541,9 @@ end)
 UIS.InputBegan:Connect(function(input, gpe)
     if gpe then return end
     if input.KeyCode == Enum.KeyCode.E then
-       -- noclipEnabled = not noclipEnabled
-       -- noclipBtn.Text = noclipEnabled and "🚶 NOCLIP: ON" or "🚶 NOCLIP: OFF"
-        --noclipBtn.BackgroundColor3 = noclipEnabled and Color3.fromRGB(80, 30, 120) or Color3.fromRGB(40, 20, 60)
+        noclipEnabled = not noclipEnabled
+        noclipBtn.Text = noclipEnabled and "🚶 NOCLIP: ON" or "🚶 NOCLIP: OFF"
+        noclipBtn.BackgroundColor3 = noclipEnabled and Color3.fromRGB(80, 30, 120) or Color3.fromRGB(40, 20, 60)
     end
 end)
 
