@@ -88,7 +88,7 @@ contentFrame.Size = UDim2.new(1, 0, 1, -35)
 contentFrame.Position = UDim2.new(0, 0, 0, 35)
 contentFrame.BackgroundTransparency = 1
 
--- === FLING SYSTEM (from KILASIK) ===
+-- === FLING SYSTEM ===
 getgenv().OldPos = nil
 getgenv().FPDH = workspace.FallenPartsDestroyHeight
 local SelectedTargets = {}
@@ -211,61 +211,174 @@ local function ToggleAll(select)
     UpdateStatus()
 end
 
--- === ANTI-FLING (отключает коллизию с игроками, НЕ с миром) ===
+-- === ANTI-FLING через группы коллизии ===
 local antiFlingEnabled = false
 local antiFlingConnections = {}
-local antiFlingParts = {}
 
-local function ToggleAntiFling(state)
-    antiFlingEnabled = state
-    if antiFlingEnabled then
-        local char = plr.Character
-        if char then
-            for _, part in pairs(char:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = false
-                    table.insert(antiFlingParts, part)
-                end
-            end
+local PLAYER_GROUP = 1
+local ANTI_FLING_GROUP = 2
+local WORLD_GROUP = 0
+
+local function SetupAntiFling(char)
+    if not char then return end
+    
+    -- Устанавливаем группу коллизии для всех частей персонажа
+    for _, part in pairs(char:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = true
+            part.CanTouch = true
+            -- Своя группа
+            part.CollisionGroup = "AntiFling"
+            -- Разрешаем коллизию только с миром (группа 0) и собой
+            part.CollisionGroupId = ANTI_FLING_GROUP
         end
-        
-        antiFlingConnections.CharacterAdded = plr.CharacterAdded:Connect(function(char)
-            task.wait(0.5)
-            for _, part in pairs(char:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = false
-                    table.insert(antiFlingParts, part)
-                end
-            end
-        end)
-        
-        antiFlingConnections.DescendantAdded = plr.CharacterAdded:Connect(function(char)
-            char.DescendantAdded:Connect(function(part)
-                if antiFlingEnabled and part:IsA("BasePart") then
-                    part.CanCollide = false
-                    table.insert(antiFlingParts, part)
-                end
-            end)
-        end)
-    else
-        local char = plr.Character
-        if char then
-            for _, part in pairs(char:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = true
-                end
-            end
-        end
-        
-        for _, conn in pairs(antiFlingConnections) do
-            conn:Disconnect()
-        end
-        antiFlingConnections = {}
-        antiFlingParts = {}
     end
 end
 
--- === FLING FUNCTION (from KILASIK) ===
+local function ResetCollision(char)
+    if not char then return end
+    for _, part in pairs(char:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CollisionGroup = "Default"
+            part.CollisionGroupId = PLAYER_GROUP
+            part.CanCollide = true
+            part.CanTouch = true
+        end
+    end
+end
+
+-- Создаём группы коллизии
+local function SetupCollisionGroups()
+    -- Проверяем и создаём группы
+    local groups = {}
+    for i = 0, 31 do
+        local name = game:GetService("PhysicsService"):GetCollisionGroupName(i)
+        if name ~= "" then
+            groups[name] = i
+        end
+    end
+    
+    if not groups["Default"] then
+        game:GetService("PhysicsService"):CreateCollisionGroup("Default")
+    end
+    if not groups["Players"] then
+        game:GetService("PhysicsService"):CreateCollisionGroup("Players")
+    end
+    if not groups["AntiFling"] then
+        game:GetService("PhysicsService"):CreateCollisionGroup("AntiFling")
+    end
+    if not groups["World"] then
+        game:GetService("PhysicsService"):CreateCollisionGroup("World")
+    end
+    
+    -- Настройка коллизий:
+    -- AntiFling не сталкивается с Players, но сталкивается с World и Default
+    game:GetService("PhysicsService"):SetCollisionGroupsEnabled(true)
+    
+    -- Отключаем коллизию AntiFling с Players
+    pcall(function()
+        game:GetService("PhysicsService"):CollisionGroupSetCollidable("AntiFling", "Players", false)
+    end)
+    
+    -- Включаем коллизию AntiFling с World и Default
+    pcall(function()
+        game:GetService("PhysicsService"):CollisionGroupSetCollidable("AntiFling", "World", true)
+    end)
+    pcall(function()
+        game:GetService("PhysicsService"):CollisionGroupSetCollidable("AntiFling", "Default", true)
+    end)
+end
+
+local function ToggleAntiFling(state)
+    antiFlingEnabled = state
+    
+    if state then
+        -- Включаем защиту
+        local char = plr.Character
+        if char then
+            SetupAntiFling(char)
+        end
+        
+        -- Следим за новыми частями
+        if antiFlingConnections.CharacterAdded then
+            antiFlingConnections.CharacterAdded:Disconnect()
+        end
+        antiFlingConnections.CharacterAdded = plr.CharacterAdded:Connect(function(char)
+            task.wait(0.5)
+            if antiFlingEnabled then
+                SetupAntiFling(char)
+            end
+        end)
+        
+        -- Следим за новыми частями в персонаже
+        if antiFlingConnections.DescendantAdded then
+            antiFlingConnections.DescendantAdded:Disconnect()
+        end
+        antiFlingConnections.DescendantAdded = plr.CharacterAdded:Connect(function(char)
+            local conn
+            conn = char.DescendantAdded:Connect(function(part)
+                if antiFlingEnabled and part:IsA("BasePart") then
+                    part.CollisionGroup = "AntiFling"
+                    part.CollisionGroupId = ANTI_FLING_GROUP
+                end
+            end)
+            table.insert(antiFlingConnections, conn)
+        end)
+        
+    else
+        -- Выключаем защиту
+        local char = plr.Character
+        if char then
+            ResetCollision(char)
+        end
+        
+        for _, conn in pairs(antiFlingConnections) do
+            pcall(function() conn:Disconnect() end)
+        end
+        antiFlingConnections = {}
+    end
+end
+
+-- Инициализация групп коллизии
+SetupCollisionGroups()
+
+-- Также добавляем всех игроков в группу Players при появлении
+local function AddPlayerToGroup(player)
+    if player == plr then return end
+    local char = player.Character
+    if char then
+        for _, part in pairs(char:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CollisionGroup = "Players"
+                part.CollisionGroupId = PLAYER_GROUP
+            end
+        end
+    end
+end
+
+-- Добавляем всех существующих игроков
+for _, player in pairs(Players:GetPlayers()) do
+    if player ~= plr then
+        AddPlayerToGroup(player)
+    end
+end
+
+-- Следим за новыми игроками
+Players.PlayerAdded:Connect(function(player)
+    if player ~= plr then
+        player.CharacterAdded:Connect(function(char)
+            task.wait(0.5)
+            for _, part in pairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CollisionGroup = "Players"
+                    part.CollisionGroupId = PLAYER_GROUP
+                end
+            end
+        end)
+    end
+end)
+
+-- === FLING FUNCTION ===
 local function SkidFling(TargetPlayer)
     local Character = plr.Character
     local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
@@ -505,7 +618,7 @@ antiFlingBtn.MouseButton1Click:Connect(function()
     antiFlingBtn.BackgroundColor3 = newState and Color3.fromRGB(80, 30, 120) or Color3.fromRGB(40, 20, 60)
 end)
 
--- Noclip toggle
+-- Noclip toggle (без бинда на E)
 local noclipBtn = Instance.new("TextButton", contentFrame)
 noclipBtn.Size = UDim2.new(0.92, 0, 0, 30)
 noclipBtn.Position = UDim2.new(0.04, 0, 0, btnY + 128)
@@ -524,7 +637,7 @@ noclipBtn.MouseButton1Click:Connect(function()
     noclipBtn.BackgroundColor3 = noclipEnabled and Color3.fromRGB(80, 30, 120) or Color3.fromRGB(40, 20, 60)
 end)
 
--- Noclip logic (отключает коллизию со ВСЕМ, включая мир)
+-- Noclip logic
 RunService.Stepped:Connect(function()
     if noclipEnabled then
         local char = plr.Character
@@ -537,7 +650,6 @@ RunService.Stepped:Connect(function()
         end
     end
 end)
-
 
 -- Initialize
 UpdatePlayerList()
