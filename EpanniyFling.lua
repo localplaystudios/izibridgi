@@ -8,7 +8,7 @@ gui.Name = "EpanniyFling"..math.random(1,9999999)
 
 -- Main Container
 local mainContainer = Instance.new("Frame", gui)
-mainContainer.Size = UDim2.new(0, 340, 0, 360)
+mainContainer.Size = UDim2.new(0, 340, 0, 380)
 mainContainer.Position = UDim2.new(0.3, 0, 0.3, 0)
 mainContainer.BackgroundTransparency = 1
 mainContainer.Active = true
@@ -78,7 +78,7 @@ minimizeBtn.MouseButton1Click:Connect(function()
     if isMinimized then
         mainContainer.Size = UDim2.new(0, 340, 0, 35)
     else
-        mainContainer.Size = UDim2.new(0, 340, 0, 360)
+        mainContainer.Size = UDim2.new(0, 340, 0, 380)
     end
 end)
 
@@ -108,7 +108,7 @@ StatusLabel.TextXAlignment = Enum.TextXAlignment.Left
 
 -- Player list
 local playerListFrame = Instance.new("Frame", contentFrame)
-playerListFrame.Size = UDim2.new(1, -20, 0, 140)
+playerListFrame.Size = UDim2.new(1, -20, 0, 120)
 playerListFrame.Position = UDim2.new(0, 10, 0, 35)
 playerListFrame.BackgroundColor3 = Color3.fromRGB(30, 15, 40)
 local listCorner = Instance.new("UICorner", playerListFrame)
@@ -135,7 +135,7 @@ local function UpdatePlayerList()
     for _, player in ipairs(players) do
         if player ~= plr then
             local entry = Instance.new("Frame", playerScroll)
-            entry.Size = UDim2.new(1, -10, 0, 28)
+            entry.Size = UDim2.new(1, -10, 0, 26)
             entry.Position = UDim2.new(0, 5, 0, yPos)
             entry.BackgroundColor3 = Color3.fromRGB(45, 25, 55)
             local entryCorner = Instance.new("UICorner", entry)
@@ -147,7 +147,7 @@ local function UpdatePlayerList()
             checkmark.BackgroundTransparency = 1
             checkmark.Text = SelectedTargets[player.Name] and "✓" or ""
             checkmark.TextColor3 = Color3.fromRGB(0, 255, 0)
-            checkmark.TextSize = 18
+            checkmark.TextSize = 16
             checkmark.Font = Enum.Font.GothamBold
             checkmark.TextXAlignment = Enum.TextXAlignment.Center
             
@@ -157,7 +157,7 @@ local function UpdatePlayerList()
             nameLabel.BackgroundTransparency = 1
             nameLabel.Text = player.Name
             nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-            nameLabel.TextSize = 14
+            nameLabel.TextSize = 13
             nameLabel.Font = Enum.Font.Gotham
             nameLabel.TextXAlignment = Enum.TextXAlignment.Left
             
@@ -178,7 +178,7 @@ local function UpdatePlayerList()
                 UpdateStatus()
             end)
             
-            yPos = yPos + 33
+            yPos = yPos + 31
         end
     end
     playerScroll.CanvasSize = UDim2.new(0, 0, 0, yPos + 5)
@@ -211,82 +211,32 @@ local function ToggleAll(select)
     UpdateStatus()
 end
 
--- === ANTI-FLING через группы коллизии ===
+-- === ANTI-FLING SYSTEM (рабочая, из твоего скрипта) ===
 local antiFlingEnabled = false
 local antiFlingConnections = {}
+local antiFlingParts = {}
 
-local PLAYER_GROUP = 1
-local ANTI_FLING_GROUP = 2
-local WORLD_GROUP = 0
-
-local function SetupAntiFling(char)
-    if not char then return end
-    
-    -- Устанавливаем группу коллизии для всех частей персонажа
-    for _, part in pairs(char:GetDescendants()) do
-        if part:IsA("BasePart") then
-            part.CanCollide = true
-            part.CanTouch = true
-            -- Своя группа
-            part.CollisionGroup = "AntiFling"
-            -- Разрешаем коллизию только с миром (группа 0) и собой
-            part.CollisionGroupId = ANTI_FLING_GROUP
-        end
+local function ApplyAntiFlingToPart(part)
+    if not part or not part:IsA("BasePart") then return end
+    if part.Name == "HumanoidRootPart" or part:IsA("BasePart") then
+        pcall(function()
+            part.CustomPhysicalProperties = PhysicalProperties.new(0, 0, 0, 0, 0)
+            part.Velocity = Vector3.new(0, 0, 0)
+            part.RotVelocity = Vector3.new(0, 0, 0)
+            part.CanCollide = false
+            part.CanTouch = false
+        end)
+        table.insert(antiFlingParts, part)
     end
 end
 
-local function ResetCollision(char)
-    if not char then return end
-    for _, part in pairs(char:GetDescendants()) do
-        if part:IsA("BasePart") then
-            part.CollisionGroup = "Default"
-            part.CollisionGroupId = PLAYER_GROUP
-            part.CanCollide = true
-            part.CanTouch = true
+local function SetupAntiFling()
+    -- Ищем все части в игре
+    for _, v in next, game:GetDescendants() do
+        if v and v:IsA("BasePart") and v.Parent ~= plr.Character and v.Name == "HumanoidRootPart" then
+            ApplyAntiFlingToPart(v)
         end
     end
-end
-
--- Создаём группы коллизии
-local function SetupCollisionGroups()
-    -- Проверяем и создаём группы
-    local groups = {}
-    for i = 0, 31 do
-        local name = game:GetService("PhysicsService"):GetCollisionGroupName(i)
-        if name ~= "" then
-            groups[name] = i
-        end
-    end
-    
-    if not groups["Default"] then
-        game:GetService("PhysicsService"):CreateCollisionGroup("Default")
-    end
-    if not groups["Players"] then
-        game:GetService("PhysicsService"):CreateCollisionGroup("Players")
-    end
-    if not groups["AntiFling"] then
-        game:GetService("PhysicsService"):CreateCollisionGroup("AntiFling")
-    end
-    if not groups["World"] then
-        game:GetService("PhysicsService"):CreateCollisionGroup("World")
-    end
-    
-    -- Настройка коллизий:
-    -- AntiFling не сталкивается с Players, но сталкивается с World и Default
-    game:GetService("PhysicsService"):SetCollisionGroupsEnabled(true)
-    
-    -- Отключаем коллизию AntiFling с Players
-    pcall(function()
-        game:GetService("PhysicsService"):CollisionGroupSetCollidable("AntiFling", "Players", false)
-    end)
-    
-    -- Включаем коллизию AntiFling с World и Default
-    pcall(function()
-        game:GetService("PhysicsService"):CollisionGroupSetCollidable("AntiFling", "World", true)
-    end)
-    pcall(function()
-        game:GetService("PhysicsService"):CollisionGroupSetCollidable("AntiFling", "Default", true)
-    end)
 end
 
 local function ToggleAntiFling(state)
@@ -294,43 +244,41 @@ local function ToggleAntiFling(state)
     
     if state then
         -- Включаем защиту
-        local char = plr.Character
-        if char then
-            SetupAntiFling(char)
-        end
+        SetupAntiFling()
         
         -- Следим за новыми частями
-        if antiFlingConnections.CharacterAdded then
-            antiFlingConnections.CharacterAdded:Disconnect()
-        end
-        antiFlingConnections.CharacterAdded = plr.CharacterAdded:Connect(function(char)
-            task.wait(0.5)
-            if antiFlingEnabled then
-                SetupAntiFling(char)
-            end
-        end)
-        
-        -- Следим за новыми частями в персонаже
         if antiFlingConnections.DescendantAdded then
             antiFlingConnections.DescendantAdded:Disconnect()
         end
-        antiFlingConnections.DescendantAdded = plr.CharacterAdded:Connect(function(char)
-            local conn
-            conn = char.DescendantAdded:Connect(function(part)
-                if antiFlingEnabled and part:IsA("BasePart") then
-                    part.CollisionGroup = "AntiFling"
-                    part.CollisionGroupId = ANTI_FLING_GROUP
-                end
-            end)
-            table.insert(antiFlingConnections, conn)
+        antiFlingConnections.DescendantAdded = workspace.DescendantAdded:Connect(function(part)
+            if antiFlingEnabled and part:IsA("BasePart") and part.Name == "HumanoidRootPart" and part.Parent ~= plr.Character then
+                task.wait(0.5)
+                ApplyAntiFlingToPart(part)
+            end
+        end)
+        
+        -- Следим за CharacterAdded для очистки
+        if antiFlingConnections.CharacterAdded then
+            antiFlingConnections.CharacterAdded:Disconnect()
+        end
+        antiFlingConnections.CharacterAdded = plr.CharacterAdded:Connect(function()
+            -- При респавне пересоздаём защиту
+            task.wait(1)
+            if antiFlingEnabled then
+                SetupAntiFling()
+            end
         end)
         
     else
-        -- Выключаем защиту
-        local char = plr.Character
-        if char then
-            ResetCollision(char)
+        -- Выключаем защиту - восстанавливаем параметры
+        for _, part in pairs(antiFlingParts) do
+            pcall(function()
+                part.CustomPhysicalProperties = PhysicalProperties.new(0.7, 0.3, 0.5, 0.5, 0.5)
+                part.CanCollide = true
+                part.CanTouch = true
+            end)
         end
+        antiFlingParts = {}
         
         for _, conn in pairs(antiFlingConnections) do
             pcall(function() conn:Disconnect() end)
@@ -338,45 +286,6 @@ local function ToggleAntiFling(state)
         antiFlingConnections = {}
     end
 end
-
--- Инициализация групп коллизии
-SetupCollisionGroups()
-
--- Также добавляем всех игроков в группу Players при появлении
-local function AddPlayerToGroup(player)
-    if player == plr then return end
-    local char = player.Character
-    if char then
-        for _, part in pairs(char:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.CollisionGroup = "Players"
-                part.CollisionGroupId = PLAYER_GROUP
-            end
-        end
-    end
-end
-
--- Добавляем всех существующих игроков
-for _, player in pairs(Players:GetPlayers()) do
-    if player ~= plr then
-        AddPlayerToGroup(player)
-    end
-end
-
--- Следим за новыми игроками
-Players.PlayerAdded:Connect(function(player)
-    if player ~= plr then
-        player.CharacterAdded:Connect(function(char)
-            task.wait(0.5)
-            for _, part in pairs(char:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CollisionGroup = "Players"
-                    part.CollisionGroupId = PLAYER_GROUP
-                end
-            end
-        end)
-    end
-end)
 
 -- === FLING FUNCTION ===
 local function SkidFling(TargetPlayer)
@@ -541,11 +450,11 @@ local function StopFling()
 end
 
 -- === GUI BUTTONS ===
-local btnY = 185
+local btnY = 165
 
 -- Start Button
 local startBtn = Instance.new("TextButton", contentFrame)
-startBtn.Size = UDim2.new(0.44, 0, 0, 40)
+startBtn.Size = UDim2.new(0.44, 0, 0, 38)
 startBtn.Position = UDim2.new(0.05, 0, 0, btnY)
 startBtn.Text = "▶ START"
 startBtn.Font = Enum.Font.GothamBold
@@ -559,7 +468,7 @@ startBtn.MouseButton1Click:Connect(StartFling)
 
 -- Stop Button
 local stopBtn = Instance.new("TextButton", contentFrame)
-stopBtn.Size = UDim2.new(0.44, 0, 0, 40)
+stopBtn.Size = UDim2.new(0.44, 0, 0, 38)
 stopBtn.Position = UDim2.new(0.51, 0, 0, btnY)
 stopBtn.Text = "⏹ STOP"
 stopBtn.Font = Enum.Font.GothamBold
@@ -573,11 +482,11 @@ stopBtn.MouseButton1Click:Connect(StopFling)
 
 -- Select All
 local selAllBtn = Instance.new("TextButton", contentFrame)
-selAllBtn.Size = UDim2.new(0.44, 0, 0, 32)
-selAllBtn.Position = UDim2.new(0.05, 0, 0, btnY + 48)
+selAllBtn.Size = UDim2.new(0.44, 0, 0, 30)
+selAllBtn.Position = UDim2.new(0.05, 0, 0, btnY + 46)
 selAllBtn.Text = "✅ SELECT ALL"
 selAllBtn.Font = Enum.Font.Gotham
-selAllBtn.TextSize = 13
+selAllBtn.TextSize = 12
 selAllBtn.BackgroundColor3 = Color3.fromRGB(50, 25, 65)
 selAllBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 local saCorner = Instance.new("UICorner", selAllBtn)
@@ -587,11 +496,11 @@ selAllBtn.MouseButton1Click:Connect(function() ToggleAll(true) end)
 
 -- Deselect All
 local desAllBtn = Instance.new("TextButton", contentFrame)
-desAllBtn.Size = UDim2.new(0.44, 0, 0, 32)
-desAllBtn.Position = UDim2.new(0.51, 0, 0, btnY + 48)
+desAllBtn.Size = UDim2.new(0.44, 0, 0, 30)
+desAllBtn.Position = UDim2.new(0.51, 0, 0, btnY + 46)
 desAllBtn.Text = "❌ DESELECT ALL"
 desAllBtn.Font = Enum.Font.Gotham
-desAllBtn.TextSize = 13
+desAllBtn.TextSize = 12
 desAllBtn.BackgroundColor3 = Color3.fromRGB(50, 25, 65)
 desAllBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 local daCorner = Instance.new("UICorner", desAllBtn)
@@ -599,10 +508,10 @@ daCorner.CornerRadius = UDim.new(0, 8)
 
 desAllBtn.MouseButton1Click:Connect(function() ToggleAll(false) end)
 
--- Anti-Fling Button
+-- Anti-Fling Button (исправленная версия)
 local antiFlingBtn = Instance.new("TextButton", contentFrame)
-antiFlingBtn.Size = UDim2.new(0.92, 0, 0, 32)
-antiFlingBtn.Position = UDim2.new(0.04, 0, 0, btnY + 88)
+antiFlingBtn.Size = UDim2.new(0.92, 0, 0, 34)
+antiFlingBtn.Position = UDim2.new(0.04, 0, 0, btnY + 84)
 antiFlingBtn.Text = "🛡️ ANTI-FLING: OFF"
 antiFlingBtn.Font = Enum.Font.GothamBold
 antiFlingBtn.TextSize = 14
@@ -616,12 +525,26 @@ antiFlingBtn.MouseButton1Click:Connect(function()
     ToggleAntiFling(newState)
     antiFlingBtn.Text = newState and "🛡️ ANTI-FLING: ON" or "🛡️ ANTI-FLING: OFF"
     antiFlingBtn.BackgroundColor3 = newState and Color3.fromRGB(80, 30, 120) or Color3.fromRGB(40, 20, 60)
+    
+    if newState then
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "🛡️ Anti-Fling",
+            Text = "Anti-Fling activated! You are protected.",
+            Duration = 3
+        })
+    else
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "🛡️ Anti-Fling",
+            Text = "Anti-Fling deactivated.",
+            Duration = 2
+        })
+    end
 end)
 
--- Noclip toggle (без бинда на E)
+-- Noclip toggle
 local noclipBtn = Instance.new("TextButton", contentFrame)
 noclipBtn.Size = UDim2.new(0.92, 0, 0, 30)
-noclipBtn.Position = UDim2.new(0.04, 0, 0, btnY + 128)
+noclipBtn.Position = UDim2.new(0.04, 0, 0, btnY + 126)
 noclipBtn.Text = "🚶 NOCLIP: OFF"
 noclipBtn.Font = Enum.Font.GothamBold
 noclipBtn.TextSize = 14
