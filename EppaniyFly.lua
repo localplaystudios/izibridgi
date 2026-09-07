@@ -1,4 +1,4 @@
--- FLY GUI V3 | RAGE STYLE
+-- FLY GUI V3
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
@@ -7,13 +7,19 @@ local plr = Players.LocalPlayer
 local gui = Instance.new("ScreenGui", game.CoreGui)
 gui.Name = "EppaniyFly"
 
--- Главный фрейм
-local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 320, 0, 220)
-frame.Position = UDim2.new(0.35, 0, 0.35, 0)
+-- Главный контейнер (двигается целиком)
+local mainContainer = Instance.new("Frame", gui)
+mainContainer.Size = UDim2.new(0, 320, 0, 220)
+mainContainer.Position = UDim2.new(0.35, 0, 0.35, 0)
+mainContainer.BackgroundTransparency = 1
+mainContainer.Active = true
+mainContainer.Draggable = true
+
+-- Фрейм (содержимое)
+local frame = Instance.new("Frame", mainContainer)
+frame.Size = UDim2.new(1, 0, 1, 0)
 frame.BackgroundColor3 = Color3.fromRGB(20, 10, 30)
-frame.Active = true
-frame.Draggable = true
+frame.ZIndex = 1
 local frameCorner = Instance.new("UICorner", frame)
 frameCorner.CornerRadius = UDim.new(0, 14)
 
@@ -25,13 +31,13 @@ gradient.Color = ColorSequence.new({
 })
 gradient.Rotation = 45
 
--- Заголовок (всегда виден)
-local titleFrame = Instance.new("Frame", gui)
-titleFrame.Size = UDim2.new(0, 320, 0, 35)
-titleFrame.Position = UDim2.new(0.35, 0, 0.35, 0)
+-- Заголовок (ПОВЕРХ фрейма)
+local titleFrame = Instance.new("Frame", mainContainer)
+titleFrame.Size = UDim2.new(1, 0, 0, 35)
+titleFrame.Position = UDim2.new(0, 0, 0, 0)
 titleFrame.BackgroundColor3 = Color3.fromRGB(60, 20, 80)
-titleFrame.Active = true
-titleFrame.Draggable = true
+titleFrame.ZIndex = 10
+titleFrame.BackgroundTransparency = 0
 local titleCorner = Instance.new("UICorner", titleFrame)
 titleCorner.CornerRadius = UDim.new(0, 14)
 
@@ -49,6 +55,7 @@ title.Font = Enum.Font.GothamBold
 title.TextSize = 18
 title.Text = "✈ EPPANIY FLY"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.ZIndex = 11
 
 -- Кнопка свернуть
 local minimizeBtn = Instance.new("TextButton", titleFrame)
@@ -59,6 +66,7 @@ minimizeBtn.Text = "─"
 minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 minimizeBtn.TextSize = 20
 minimizeBtn.Font = Enum.Font.GothamBold
+minimizeBtn.ZIndex = 11
 local minCorner = Instance.new("UICorner", minimizeBtn)
 minCorner.CornerRadius = UDim.new(0, 8)
 
@@ -68,6 +76,11 @@ minimizeBtn.MouseButton1Click:Connect(function()
     isMinimized = not isMinimized
     frame.Visible = not isMinimized
     minimizeBtn.Text = isMinimized and "+" or "─"
+    if isMinimized then
+        mainContainer.Size = UDim2.new(0, 320, 0, 35)
+    else
+        mainContainer.Size = UDim2.new(0, 320, 0, 220)
+    end
 end)
 
 -- Контент
@@ -146,7 +159,7 @@ downBtn.TextColor3 = Color3.fromRGB(255,255,255)
 local downCorner = Instance.new("UICorner", downBtn)
 downCorner.CornerRadius = UDim.new(0, 10)
 
--- Кнопка закрыть GUI
+-- Кнопка закрыть GUI (скрыта)
 local closeBtn = Instance.new("TextButton", contentFrame)
 closeBtn.Size = UDim2.new(0.92, 0, 0, 35)
 closeBtn.Position = UDim2.new(0.04, 0, 0, 150)
@@ -159,7 +172,7 @@ closeBtn.Visible = false
 local closeCorner = Instance.new("UICorner", closeBtn)
 closeCorner.CornerRadius = UDim.new(0, 10)
 
--- === ЛОГИКА (оригинальная, адаптирована под новые кнопки) ===
+-- === ЛОГИКА ===
 local speeds = 1
 local nowe = false
 local tpwalking = false
@@ -201,7 +214,6 @@ flyBtn.MouseButton1Click:Connect(function()
         tpwalking = false
         if chr:FindFirstChild("Animate") then chr.Animate.Disabled = false end
         if chr:FindFirstChild("Humanoid") then chr.Humanoid.PlatformStand = false end
-        -- Удаляем старые боди-части (если были)
         for _, v in pairs(chr:GetDescendants()) do
             if v:IsA("BodyGyro") or v:IsA("BodyVelocity") or v:IsA("BodyAngularVelocity") then
                 v:Destroy()
@@ -245,7 +257,6 @@ flyBtn.MouseButton1Click:Connect(function()
         hum:SetStateEnabled(Enum.HumanoidStateType.Swimming, false)
         hum:ChangeState(Enum.HumanoidStateType.Swimming)
 
-        -- Запускаем полёт R6/R15
         local plrChar = plr.Character
         if not plrChar then return end
         local torso = plrChar:FindFirstChild("Torso") or plrChar:FindFirstChild("UpperTorso")
@@ -288,14 +299,12 @@ flyBtn.MouseButton1Click:Connect(function()
                 end
                 bg.cframe = game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad((ctrl.f + ctrl.b) * 50 * speed / maxspeed), 0, 0)
 
-                -- Управление WASD
                 ctrl = {f = 0, b = 0, l = 0, r = 0}
                 if UIS:IsKeyDown(Enum.KeyCode.W) then ctrl.f = 1 end
                 if UIS:IsKeyDown(Enum.KeyCode.S) then ctrl.b = -1 end
                 if UIS:IsKeyDown(Enum.KeyCode.A) then ctrl.l = -1 end
                 if UIS:IsKeyDown(Enum.KeyCode.D) then ctrl.r = 1 end
             end
-            -- Очистка при выключении
             bg:Destroy()
             bv:Destroy()
             if plrChar and plrChar:FindFirstChild("Humanoid") then
@@ -405,4 +414,4 @@ plr.CharacterAdded:Connect(function()
     end
 end)
 
-print("RAGE FLY GUI LOADED")
+print("EPANNIY FLY LOADED")
