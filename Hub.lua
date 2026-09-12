@@ -3,7 +3,7 @@ local Players = game:GetService("Players")
 local plr = Players.LocalPlayer
 
 local gui = Instance.new("ScreenGui", game.CoreGui)
-gui.Name = "EppaniyHub"
+gui.Name = "EppaniyHub"..math.random(1,9999999999)
 
 -- Main container
 local mainContainer = Instance.new("Frame", gui)
@@ -50,7 +50,7 @@ title.Size = UDim2.new(1, 0, 1, 0)
 title.BackgroundTransparency = 1
 title.Font = Enum.Font.GothamBold
 title.TextSize = 18
-title.Text = "📦 SCRIPT HUB \\// 🤙 EPANNIY HUB"
+title.Text = "📦 SCRIPT HUB \\// 🤙 EBANNIY HUB"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.ZIndex = 11
 
@@ -77,9 +77,9 @@ contentFrame.BackgroundTransparency = 1
 
 -- === СКРИПТЫ С КАТЕГОРИЯМИ ===
 local scripts = {
-    {name = "💥 Epanniy Fling",  category = "Branded Universal", url = "https://raw.githubusercontent.com/localplaystudios/izibridgi/refs/heads/main/EpanniyFling.lua"},
-    {name = "✈ Eppaniy Fly",     category = "Branded Universal", url = "https://raw.githubusercontent.com/localplaystudios/izibridgi/refs/heads/main/EppaniyFly.lua"},
-    {name = "🎵 Eppaniy Music",  category = "Branded Universal", url = "https://raw.githubusercontent.com/localplaystudios/izibridgi/refs/heads/main/EppaniyMusic.lua"},
+    {name = "💥 Ebanniy Fling",  category = "Branded Universal", url = "https://raw.githubusercontent.com/localplaystudios/izibridgi/refs/heads/main/EbanniyFling.lua"},
+    {name = "✈ Ebanniy Fly",     category = "Branded Universal", url = "https://raw.githubusercontent.com/localplaystudios/izibridgi/refs/heads/main/EbanniyFly.lua"},
+    {name = "🎵 Ebpanniy Music",  category = "Branded Universal", url = "https://raw.githubusercontent.com/localplaystudios/izibridgi/refs/heads/main/EbanniyMusic.lua"},
     {name = "♾ Infinite Yield",  category = "Universal", url = "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"},
     {name = "🔲 Dex Explorer ++",  category = "Universal", url = "https://github.com/AZYsGithub/DexPlusPlus/releases/latest/download/out.lua"},
     {name = "🔪 MM2 Script #1",  category = "MM2", url = "https://raw.githubusercontent.com/thunderXhub/ThunderXHUB/refs/heads/main/loader"},
@@ -265,4 +265,4 @@ minimizeBtn.MouseButton1Click:Connect(function()
     end
 end)
 
-print("EPANNIY SCRIPT HUB (CATEGORIES) LOADED")
+print("Ebanniy Hub Loaded!")
