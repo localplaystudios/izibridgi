@@ -79,7 +79,7 @@ contentFrame.BackgroundTransparency = 1
 local scripts = {
     {name = "💥 Ebanniy Fling",  category = "Branded Universal", url = "https://raw.githubusercontent.com/localplaystudios/izibridgi/refs/heads/main/EbanniyFling.lua"},
     {name = "✈ Ebanniy Fly",     category = "Branded Universal", url = "https://raw.githubusercontent.com/localplaystudios/izibridgi/refs/heads/main/EbanniyFly.lua"},
-    {name = "🎵 Ebpanniy Music",  category = "Branded Universal", url = "https://raw.githubusercontent.com/localplaystudios/izibridgi/refs/heads/main/EbanniyMusic.lua"},
+    {name = "🎵 Ebanniy Music",  category = "Branded Universal", url = "https://raw.githubusercontent.com/localplaystudios/izibridgi/refs/heads/main/EbanniyMusic.lua"},
     {name = "♾ Infinite Yield",  category = "Universal", url = "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"},
     {name = "🔲 Dex Explorer ++",  category = "Universal", url = "https://github.com/AZYsGithub/DexPlusPlus/releases/latest/download/out.lua"},
     {name = "🔪 MM2 Script #1",  category = "MM2", url = "https://raw.githubusercontent.com/thunderXhub/ThunderXHUB/refs/heads/main/loader"},
