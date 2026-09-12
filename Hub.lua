@@ -91,6 +91,7 @@ local scripts = {
     {name = "✈ Eppaniy Fly", url = "https://raw.githubusercontent.com/localplaystudios/izibridgi/refs/heads/main/EppaniyFly.lua"},
     {name = "🔪 MM2 Script #1", url = "https://raw.githubusercontent.com/thunderXhub/ThunderXHUB/refs/heads/main/loader"},
     {name = "🚪 DOORS Script #1", url = "https://raw.githubusercontent.com/bocaj111004/Abysall/refs/heads/main/Loader.luau"},
+    {name = "🚪 DOORS Script #2", url = "https://www.msdoors.xyz/script"},
 }
 
 local function buildUI()
