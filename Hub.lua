@@ -3,7 +3,8 @@ local Players = game:GetService("Players")
 local plr = Players.LocalPlayer
 
 local gui = Instance.new("ScreenGui", game.CoreGui)
-gui.Name = "EpanniyHub_" .. tostring(os.time()) .. "_" .. tostring(math.random(1000, 9999))
+local HttpService = game:GetService("HttpService")
+gui.Name = "EpanniyHub_" .. HttpService:GenerateGUID(false)
 
 -- Main container
 local mainContainer = Instance.new("Frame", gui)
