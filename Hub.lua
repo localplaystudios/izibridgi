@@ -1,696 +1,154 @@
-local SCRIPTS = {
+-- SCRIPT HUB | RAGE STYLE
+local Players = game:GetService("Players")
+local plr = Players.LocalPlayer
+
+local gui = Instance.new("ScreenGui", game.CoreGui)
+gui.Name = "EppaniyHub"
+
+-- Главный контейнер
+local mainContainer = Instance.new("Frame", gui)
+mainContainer.Size = UDim2.new(0, 360, 0, 300)
+mainContainer.Position = UDim2.new(0.35, 0, 0.3, 0)
+mainContainer.BackgroundTransparency = 1
+mainContainer.Active = true
+mainContainer.Draggable = true
+
+-- Фрейм (содержимое)
+local frame = Instance.new("Frame", mainContainer)
+frame.Size = UDim2.new(1, 0, 1, 0)
+frame.BackgroundColor3 = Color3.fromRGB(20, 10, 30)
+frame.ZIndex = 1
+local frameCorner = Instance.new("UICorner", frame)
+frameCorner.CornerRadius = UDim.new(0, 14)
+
+local gradient = Instance.new("UIGradient", frame)
+gradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(60, 20, 80)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(25, 5, 40)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(10, 5, 20))
+})
+gradient.Rotation = 45
+
+-- Заголовок (ПОВЕРХ фрейма)
+local titleFrame = Instance.new("Frame", mainContainer)
+titleFrame.Size = UDim2.new(1, 0, 0, 35)
+titleFrame.Position = UDim2.new(0, 0, 0, 0)
+titleFrame.BackgroundColor3 = Color3.fromRGB(60, 20, 80)
+titleFrame.ZIndex = 10
+titleFrame.BackgroundTransparency = 0
+local titleCorner = Instance.new("UICorner", titleFrame)
+titleCorner.CornerRadius = UDim.new(0, 14)
+
+local titleGrad = Instance.new("UIGradient", titleFrame)
+titleGrad.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(80, 30, 120)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(40, 10, 70))
+})
+titleGrad.Rotation = 90
+
+local title = Instance.new("TextLabel", titleFrame)
+title.Size = UDim2.new(1, 0, 1, 0)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+title.Text = "📦 SCRIPT HUB \\// 🤙 EPANNIY HUB"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.ZIndex = 11
+
+-- Кнопка свернуть
+local minimizeBtn = Instance.new("TextButton", titleFrame)
+minimizeBtn.Size = UDim2.new(0, 30, 0, 30)
+minimizeBtn.Position = UDim2.new(1, -35, 0, 2)
+minimizeBtn.BackgroundColor3 = Color3.fromRGB(40, 10, 60)
+minimizeBtn.Text = "─"
+minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimizeBtn.TextSize = 20
+minimizeBtn.Font = Enum.Font.GothamBold
+minimizeBtn.ZIndex = 11
+local minCorner = Instance.new("UICorner", minimizeBtn)
+minCorner.CornerRadius = UDim.new(0, 8)
+
+local isMinimized = false
+
+-- Контент
+local contentFrame = Instance.new("Frame", frame)
+contentFrame.Size = UDim2.new(1, 0, 1, -35)
+contentFrame.Position = UDim2.new(0, 0, 0, 35)
+contentFrame.BackgroundTransparency = 1
+
+-- ScrollingFrame
+local scrollFrame = Instance.new("ScrollingFrame", contentFrame)
+scrollFrame.Size = UDim2.new(0.94, 0, 1, -10)
+scrollFrame.Position = UDim2.new(0.03, 0, 0, 0)
+scrollFrame.BackgroundTransparency = 1
+scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+scrollFrame.ScrollBarThickness = 6
+scrollFrame.BorderSizePixel = 0
+
+-- Скрипты
+local scripts = {
     {name = "💥 Epanniy Fling", url = "https://raw.githubusercontent.com/localplaystudios/izibridgi/refs/heads/main/EpanniyFling.lua"},
-    {name = "✈ Eppaniy Fly",    url = "https://raw.githubusercontent.com/localplaystudios/izibridgi/refs/heads/main/EppaniyFly.lua"},
+    {name = "✈ Eppaniy Fly", url = "https://raw.githubusercontent.com/localplaystudios/izibridgi/refs/heads/main/EppaniyFly.lua"},
     {name = "🔪 MM2 Script #1", url = "https://raw.githubusercontent.com/thunderXhub/ThunderXHUB/refs/heads/main/loader"},
-    {name = "🚪 DOORS #1",      url = "https://raw.githubusercontent.com/bocaj111004/Abysall/refs/heads/main/Loader.luau"},
-    {name = "🚪 DOORS #2",      url = "https://www.msdoors.xyz/script"},
+    {name = "🚪 DOORS Script #1", url = "https://raw.githubusercontent.com/bocaj111004/Abysall/refs/heads/main/Loader.luau"},
+    {name = "🚪 DOORS Script #2", url = "https://www.msdoors.xyz/script"},
 }
 
-local _B64 = "bG9jYWwgUGxheWVycyA9IGdhbWU6R2V0U2VydmljZSgiUGxheWVycyIpCmxvY2FsIHBsciA9IFBsYXllcnMuTG9jYWxQbGF5ZXIKCmxvY2FsIGd1aSA9IEluc3RhbmNlLm5ldygiU2NyZWVuR3VpIiwgZ2FtZS5Db3JlR3VpKQpndWkuTmFtZSA9ICJFcHBhbml5SHViIgoKbG9jYWwgbWFpbkNvbnRhaW5lciA9IEluc3RhbmNlLm5ldygiRnJhbWUiLCBndWkpCm1haW5Db250YWluZXIuU2l6ZSA9IFVEaW0yLm5ldygwLCAzNjAsIDAsIDMwMCkKbWFpbkNvbnRhaW5lci5Qb3NpdGlvbiA9IFVEaW0yLm5ldygwLjM1LCAwLCAwLjMsIDApCm1haW5Db250YWluZXIuQmFja2dyb3VuZFRyYW5zcGFyZW5jeSA9IDEKbWFpbkNvbnRhaW5lci5BY3RpdmUgPSB0cnVlCm1haW5Db250YWluZXIuRHJhZ2dhYmxlID0gdHJ1ZQoKbG9jYWwgZnJhbWUgPSBJbnN0YW5jZS5uZXcoIkZyYW1lIiwgbWFpbkNvbnRhaW5lcikKZnJhbWUuU2l6ZSA9IFVEaW0yLm5ldygxLCAwLCAxLCAwKQpmcmFtZS5CYWNrZ3JvdW5kQ29sb3IzID0gQ29sb3IzLmZyb21SR0IoMjAsIDEwLCAzMCkKZnJhbWUuWkluZGV4ID0gMQpsb2NhbCBmcmFtZUNvcm5lciA9IEluc3RhbmNlLm5ldygiVUlDb3JuZXIiLCBmcmFtZSkKZnJhbWVDb3JuZXIuQ29ybmVyUmFkaXVzID0gVURpbS5uZXcoMCwgMTQpCgpsb2NhbCBncmFkaWVudCA9IEluc3RhbmNlLm5ldygiVUlHcmFkaWVudCIsIGZyYW1lKQpncmFkaWVudC5Db2xvciA9IENvbG9yU2VxdWVuY2UubmV3KHsKICAgIENvbG9yU2VxdWVuY2VLZXlwb2ludC5uZXcoMCwgQ29sb3IzLmZyb21SR0IoNjAsIDIwLCA4MCkpLAogICAgQ29sb3JTZXF1ZW5jZUtleXBvaW50Lm5ldygwLjUsIENvbG9yMy5mcm9tUkdCKDI1LCA1LCA0MCkpLAogICAgQ29sb3JTZXF1ZW5jZUtleXBvaW50Lm5ldygxLCBDb2xvcjMuZnJvbVJHQigxMCwgNSwgMjApKQp9KQpncmFkaWVudC5Sb3RhdGlvbiA9IDQ1Cgpsb2NhbCB0aXRsZUZyYW1lID0gSW5zdGFuY2UubmV3KCJGcmFtZSIsIG1haW5Db250YWluZXIpCnRpdGxlRnJhbWUuU2l6ZSA9IFVEaW0yLm5ldygxLCAwLCAwLCAzNSkKdGl0bGVGcmFtZS5Qb3NpdGlvbiA9IFVEaW0yLm5ldygwLCAwLCAwLCAwKQp0aXRsZUZyYW1lLkJhY2tncm91bmRDb2xvcjMgPSBDb2xvcjMuZnJvbVJHQig2MCwgMjAsIDgwKQp0aXRsZUZyYW1lLl pbmRleCA9IDEwCmxvY2FsIHRpdGxlQ29ybmVyID0gSW5zdGFuY2UubmV3KCJVSUMb3JuZXIiLCB0aXRsZUZyYW1lKQp0aXRsZUNvcm5lci5Db3JuZXJSYWRpdXMgPSBURGltLm5ldygwLCAxNCkKCmxvY2FsIHRpdGxlR3JhZCA9IEluc3RhbmNlLm5ldygiVUlHcmFkaWVudCIsIHRpdGxlRnJhbWUpCnRpdGxlR3JhZC5Db2xvciA9IENvbG9yU2VxdWVuY2UubmV3KHsKICAgIENvbG9yU2VxdWVuY2VLZXlwb2ludC5uZXcoMCwgQ29sb3IzLmZyb21SR0IoODAsIDMwLCAxMjApKSwKICAgIENvbG9yU2VxdWVuY2VLZXlwb2ludC5uZXcoMSwgQ29sb3IzLmZyb21SR0IoNDAsIDEwLCA3MCkpCn0pCnRpdGxlR3JhZC5Sb3RhdGlvbiA9IDkwCgpsb2NhbCB0aXRsZSA9IEluc3RhbmNlLm5ldygiVGV4dExhYmVsIiwgdGl0bGVGcmFtZSkKdGl0bGUuU2l6ZSA9IFVEaW0yLm5ldygxLCAwLCAxLCAwKQp0aXRsZS5CYWNrZ3JvdW5kVHJhbnNwYXJlbmN5ID0gMQp0aXRsZS5Gb250ID0gRW51bS5Gb250LkdvdGhhbUJvbGQKdGl0bGUuVGV4dFNpemUgPSAxOAp0aXRsZS5UZXh0ID0gIuKThiBTQ1JJUFQgSFVCIC8vIEVQQU5OSVkgSFVCIgp0aXRsZS5UZXh0Q29sb3IzID0gQ29sb3IzLmZyb21SR0IoMjU1LCAyNTUsIDI1NSkKdGl0bGUuWkluZGV4ID0gMTEKCmxvY2FsIG1pbmltaXplQnRuID0gSW5zdGFuY2UubmV3KCJUZXh0QnV0dG9uIiwgdGl0bGVGcmFtZSkKbWluaW1pemVCdG4uU2l6ZSA9IFVEaW0yLm5ldygwLCAzMCwgMCwgMzApCm1pbmltaXplQnRuLlBvc2l0aW9uID0gVURpbTIubmV3KDEsIC0zNSwgMCwgMikKbWluaW1pemVCdG4uQmFja2dyb3VuZENvbG9yMyA9IENvbG9yMy5mcm9tUkdCKDQwLCAxMCwgNjApCm1pbmltaXplQnRuLlRleHQgPSDigJQKbWluaW1pemVCdG4uVGV4dENvbG9yMyA9IENvbG9yMy5mcm9tUkdCKDI1NSwgMjU1LCAyNTUpCm1pbmltaXplQnRuLlRleHRTaXplID0gMjAKbWluaW1pemVCdG4uRm9udCA9IEVudW0uRm9udC5Hb3RoYW1Cb2xkCm1pbmltaXplQnRuLl pbmRleCA9IDExCmxvY2FsIG1pbkNvcm5lciA9IEluc3RhbmNlLm5ldygiVUlDb3JuZXIiLCBtaW5pbWl6ZUJ0bikKbWluQ29ybmVyLkNvcm5lclJhZGl1cyA9IFVEaW0ubmV3KDAsIDgpCgpsb2NhbCBpc01pbmltaXplZCA9IGZhbHNlCgpsb2NhbCBjb250ZW50RnJhbWUgPSBJbnN0YW5jZS5uZXcoIkZyYW1lIiwgZnJhbWUpCmNvbnRlbnRGcmFtZS5TaXplID0gVURpbTIubmV3KDEsIDAsIDEsIC0zNSkKY29udGVudEZyYW1lLlBvc2l0aW9uID0gVURpbTIubmV3KDAsIDAsIDAsIDM1KQpjb250ZW50RnJhbWUuQmFja2dyb3VuZFRyYW5zcGFyZW5jeSA9IDEKCmxvY2FsIHNjcm9sbEZyYW1lID0gSW5zdGFuY2UubmV3KCJTY3JvbGxpbmdGcmFtZSIsIGNvbnRlbnRGcmFtZSkKc2Nyb2xsRnJhbWUuU2l6ZSA9IFVEaW0yLm5ldygwLjk0LCAwLCAxLCAtMTApCnNjcm9sbEZyYW1lLlBvc2l0aW9uID0gVURpbTIubmV3KDAuMDMsIDAsIDAsIDApCnNjcm9sbEZyYW1lLkJhY2tncm91bmRUcmFuc3BhcmVuY3kgPSAxCnNjcm9sbEZyYW1lLkNhbnZhc1NpemUgPSBVU2ltMi5uZXcoMCwgMCkKc2Nyb2xsRnJhbWUuU2Nyb2xsQmFyVGhpY2tuZXNzID0gNgpzY3JvbGxGcmFtZS5Cb3JkZXJTaXplUGl4ZWwgPSAwCgpsb2NhbCBmdW5jdGlvbiBidWlsZFVJKCkKICAgIGxvY2FsIHlQb3MgPSA1CiAgICBmb3IgXywgc2NyaXB0RGF0YSBpbiBpcGFpcnMoU0NSSVBUUykgZG8KICAgICAgICBsb2NhbCBidG4gPSBJbnN0YW5jZS5uZXcoIlRleHRCdXR0b24iLCBzY3JvbGxGcmFtZSkKICAgICAgICBidG4uU2l6ZSA9IFVEaW0yLm5ldygxLCAtMTAsIDAsIDQwKQogICAgICAgIGJ0bi5Qb3NpdGlvbiA9IFVEaW0yLm5ldygwLCA1LCAwLCB5UG9zKQogICAgICAgIGJ0bi5CYWNrZ3JvdW5kQ29sb3IzID0gQ29sb3IzLmZyb21SR0IoNTAsIDI1LCA2NSkKICAgICAgICBidG4uRm9udCA9IEVudW0uRm9udC5Hb3RoYW1Cb2xkCiAgICAgICAgYnRuLlRleHRTaXplID0gMTUKICAgICAgICBidG4uVGV4dCA9IHNjcmlwdERhdGEubmFtZQogICAgICAgIGJ0bi5UZXh0Q29sb3IzID0gQ29sb3IzLmZyb21SR0IoMjU1LCAyNTUsIDI1NSkKICAgICAgICBsb2NhbCBidG5Db3JuZXIgPSBJbnN0YW5jZS5uZXcoIlVJQ29ybmVyIiwgYnRuKQogICAgICAgIGJ0bkNvcm5lci5Db3JuZXJSYWRpdXMgPSBURGltLm5ldygwLCA4KQogICAgICAgIGJ0bi5BdXRvQnV0dG9uQ29sb3IgPSB0cnVlCiAgICAgICAgYnRuLk1vdXNlQnV0dG9uMUNsaWNrOkNvbm5lY3QoZnVuY3Rpb24oKQogICAgICAgICAgICBidG4uQmFja2dyb3VuZENvbG9yMyA9IENvbG9yMy5mcm9tUkdCKDgwLCAzMCwgMTIwKQogICAgICAgICAgICB0YXNrLndhaXQoMC4xKQogICAgICAgICAgICBidG4uQmFja2dyb3VuZENvbG9yMyA9IENvbG9yMy5mcm9tUkdCKD5MCwgMjUsIDY1KQogICAgICAgICAgICBsb2NhbCBzdWNjZXNzLCBlcnIgPSBwY2FsbChmdW5jdGlvbigpCiAgICAgICAgICAgICAgICBsb2Fkc3RyaW5nKGdhbWU6SHR0cEdldChzY3JpcHREYXRhLnVybCkpKCkKICAgICAgICAgICAgZW5kKQogICAgICAgICAgICBpZiBub3Qgc3VjY2VzcyB0aGVuCiAgICAgICAgICAgICAgICBnYW1lOkdldFNlcnZpY2UoIlN0YXJ0ZXJHdWkiKTpTZXRDb3JlKCJTZW5kTm90aWZpY2F0aW9uIiwgewogICAgICAgICAgICAgICAgICAgIFRpdGxlID0gIuKdjCBFcnJvciIsCiAgICAgICAgICAgICAgICAgICAgVGV4dCA9ICJGYWlsZWQgdG8gbG9hZDogIiAuLiBzY3JpcHREYXRhLm5hbWUsCiAgICAgICAgICAgICAgICAgICAgRHVyYXRpb24gPSAzCiAgICAgICAgICAgICAgICB9KQogICAgICAgICAgICBlbHNlCiAgICAgICAgICAgICAgICBnYW1lOkdldFNlcnZpY2UoIlN0YXJ0ZXJHdWkiKTpTZXRDb3JlKCJTZW5kTm90aWZpY2F0aW9uIiwgewogICAgICAgICAgICAgICAgICAgIFRpdGxlID0gIuKchSBMb2FkZWQiLAogICAgICAgICAgICAgICAgICAgIFRleHQgPSBzY3JpcHREYXRhLm5hbWUgLi4gIiBleGVjdXRlZCEiLAogICAgICAgICAgICAgICAgICAgIER1cmF0aW9uID0gMgogICAgICAgICAgICAgICAgfSkKICAgICAgICAgICAgZW5kCiAgICAgICAgZW5kKQogICAgICAgIHlQb3MgPSB5UG9zICsgNDUKICAgIGVuZAogICAgc2Nyb2xsRnJhbWUuQ2FudmFzU2l6ZSA9IFVEaW0yLm5ldygwLCAwLCAwLCB5UG9zICsgMTApCmVuZAoKYnVpbGRVSSgpCgpteW5pbWl6ZUJ0bi5Nb3VzZUJ1dHRvbjFDbGljazpDb25uZWN0KGZ1bmN0aW9uKCkKICAgIGlzTWluaW1pemVkID0gbm90IGlzTWluaW1pemVkCiAgICBmcmFtZS5WaXNpYmxlID0gbm90IGlzTWluaW1pemVkCiAgICBtaW5pbWl6ZUJ0bi5UZXh0ID0gaXNNaW5pbWl6ZWQgYW5kICIrIiBvciDigJQKICAgIGlmIGlzTWluaW1pemVkIHRoZW4KICAgICAgICBtYWluQ29udGFpbmVyLlNpemUgPSBVREltMi5uZXcoMCwgMzYwLCAwLCAzNSkKICAgIGVsc2UKICAgICAgICBtYWluQ29udGFpbmVyLlNpemUgPSBVU2ltMi5uZXcoMCwgMzYwLCAwLCAzMDApCiAgICBlbmQKZW5kKQoKcHJpbnQoIkVQQU5OSVkgU0NSSVBUIEhVQiBMT0FERUQiKQo="
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-local function b64decode(data)
-    local b = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-    data = data:gsub("[^" .. b .. "=]", "")
-    local result = {}
-    local buffer, bits = 0, 0
-    for i = 1, #data do
-        local c = data:sub(i, i)
-        if c == "=" then break end
-        local val = b:find(c, 1, true)
-        if val then
-            buffer = buffer * 64 + (val - 1)
-            bits = bits + 6
-            if bits >= 8 then
-                bits = bits - 8
-                local byte = math.floor(buffer / (2 ^ bits)) % 256
-                table.insert(result, string.char(byte))
+local function buildUI()
+    local yPos = 5
+    for _, scriptData in ipairs(scripts) do
+        local btn = Instance.new("TextButton", scrollFrame)
+        btn.Size = UDim2.new(1, -10, 0, 40)
+        btn.Position = UDim2.new(0, 5, 0, yPos)
+        btn.BackgroundColor3 = Color3.fromRGB(50, 25, 65)
+        btn.Font = Enum.Font.GothamBold
+        btn.TextSize = 15
+        btn.Text = scriptData.name
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        local btnCorner = Instance.new("UICorner", btn)
+        btnCorner.CornerRadius = UDim.new(0, 8)
+        btn.AutoButtonColor = true
+
+        btn.MouseButton1Click:Connect(function()
+            btn.BackgroundColor3 = Color3.fromRGB(80, 30, 120)
+            task.wait(0.1)
+            btn.BackgroundColor3 = Color3.fromRGB(50, 25, 65)
+
+            local success, err = pcall(function()
+                loadstring(game:HttpGet(scriptData.url))()
+            end)
+            if not success then
+                game:GetService("StarterGui"):SetCore("SendNotification", {
+                    Title = "❌ Error",
+                    Text = "Failed to load: " .. scriptData.name,
+                    Duration = 3
+                })
+            else
+                game:GetService("StarterGui"):SetCore("SendNotification", {
+                    Title = "✅ Loaded",
+                    Text = scriptData.name .. " executed!",
+                    Duration = 2
+                })
             end
-        end
+        end)
+
+        yPos = yPos + 45
     end
-    return table.concat(result)
+    scrollFrame.CanvasSize = UDim2.new(0, 0, 0, yPos + 10)
 end
-local _src = b64decode(_B64)
-local _env = setmetatable({SCRIPTS = SCRIPTS}, {__index = _G})
-local _fn = loadstring(_src)
-if _fn then
-    if setfenv then setfenv(_fn, _env) end
-    pcall(_fn)
-else
-    warn("[Hub] loadstring unavaliable")
-end
+
+buildUI()
+
+-- Сворачивание
+minimizeBtn.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    frame.Visible = not isMinimized
+    minimizeBtn.Text = isMinimized and "+" or "─"
+    if isMinimized then
+        mainContainer.Size = UDim2.new(0, 360, 0, 35)
+    else
+        mainContainer.Size = UDim2.new(0, 360, 0, 300)
+    end
+end)
+
+print("EPANNIY SCRIPT HUB LOADED")
