@@ -81,6 +81,7 @@ local scripts = {
     {name = "✈ Eppaniy Fly",     category = "Branded Universal", url = "https://raw.githubusercontent.com/localplaystudios/izibridgi/refs/heads/main/EppaniyFly.lua"},
     {name = "🎵 Eppaniy Music",  category = "Branded Universal", url = "https://raw.githubusercontent.com/localplaystudios/izibridgi/refs/heads/main/EppaniyMusic.lua"},
     {name = "♾ Infinite Yield",  category = "Universal", url = "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"},
+    {name = "🔲 Dex Explorer ++",  category = "Universal", url = "https://github.com/AZYsGithub/DexPlusPlus/releases/latest/download/out.lua"},
     {name = "🔪 MM2 Script #1",  category = "MM2", url = "https://raw.githubusercontent.com/thunderXhub/ThunderXHUB/refs/heads/main/loader"},
     {name = "🚪 DOORS Script #1", category = "DOORS", url = "https://raw.githubusercontent.com/bocaj111004/Abysall/refs/heads/main/Loader.luau"},
     {name = "🚪 DOORS Script #2", category = "DOORS", url = "https://www.msdoors.xyz/script"},
