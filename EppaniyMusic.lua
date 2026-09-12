@@ -101,9 +101,17 @@ local function createSlider(parent, yPos, labelText, minVal, maxVal, defaultVal,
     label.TextColor3 = Color3.fromRGB(255, 255, 255)
     label.TextXAlignment = Enum.TextXAlignment.Left
 
-    local track = Instance.new("Frame", container)
+    -- Track wrapper (button для захвата)
+    local trackBtn = Instance.new("TextButton", container)
+    trackBtn.Size = UDim2.new(1, 0, 0, 20)
+    trackBtn.Position = UDim2.new(0, 0, 0, 18)
+    trackBtn.BackgroundTransparency = 1
+    trackBtn.Text = ""
+    trackBtn.AutoButtonColor = false
+
+    local track = Instance.new("Frame", trackBtn)
     track.Size = UDim2.new(1, 0, 0, 8)
-    track.Position = UDim2.new(0, 0, 0, 24)
+    track.Position = UDim2.new(0, 0, 0.5, -4)
     track.BackgroundColor3 = Color3.fromRGB(40, 20, 50)
     track.BorderSizePixel = 0
     local trackCorner = Instance.new("UICorner", track)
@@ -136,16 +144,23 @@ local function createSlider(parent, yPos, labelText, minVal, maxVal, defaultVal,
         callback(val)
     end
 
-    track.InputBegan:Connect(function(input)
+    -- Блокируем драг контейнера при нажатии на слайдер
+    trackBtn.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
+            mainContainer.Draggable = false
         end
     end)
-    track.InputEnded:Connect(function(input)
+
+    UIS.InputEnded:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = false
+            if dragging then
+                dragging = false
+                mainContainer.Draggable = true
+            end
         end
     end)
+
     UIS.InputChanged:Connect(function(input)
         if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
             local mouseX = input.Position.X
