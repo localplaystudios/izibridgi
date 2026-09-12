@@ -52,7 +52,7 @@ title.Size = UDim2.new(1, 0, 1, 0)
 title.BackgroundTransparency = 1
 title.Font = Enum.Font.GothamBold
 title.TextSize = 18
-title.Text = "🤙 EPANNIY FLING"
+title.Text = "🤙 EBANNIY FLING"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.ZIndex = 11
 
