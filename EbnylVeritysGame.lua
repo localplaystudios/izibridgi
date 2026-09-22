@@ -147,7 +147,10 @@ local function clearPipesLoop()
 end
 
 -- === AUTO CLICKER LOOP ===
+-- === AUTO CLICKER LOOP (без влияния на клиент) ===
 local function autoClickerLoop()
+    if not clickerEnabled then return end
+
     local pg = plr:FindFirstChild("PlayerGui")
     if not pg then return end
     local fg = pg:FindFirstChild("FlappityGui")
@@ -159,17 +162,18 @@ local function autoClickerLoop()
 
     local absPos = board.AbsolutePosition
     local absSize = board.AbsoluteSize
-    local cx = absPos.X + absSize.X / 2
-    local cy = absPos.Y + absSize.Y / 2
+    local cx = math.floor(absPos.X + absSize.X / 2)
+    local cy = math.floor(absPos.Y + absSize.Y / 2)
 
-    -- 1) Виртуальный клик по координатам Board
+    -- Клик через VirtualUser (не блокирует клиент)
     pcall(function()
-        game:GetService("VirtualInputManager"):SendMouseButtonEvent(cx, cy, 0, true, game, 0)
-        task.wait(1)
-        game:GetService("VirtualInputManager"):SendMouseButtonEvent(cx, cy, 0, false, game, 0)
+        local vim = game:GetService("VirtualInputManager")
+        vim:SendMouseButtonEvent(cx, cy, 0, true, game, 0)
+        task.wait(0.01)
+        vim:SendMouseButtonEvent(cx, cy, 0, false, game, 0)
     end)
 
-    -- 2) Прямой вызов активации через firesignal (если есть GuiButton)
+    -- Дополнительно: активация GuiButton внутри Board
     for _, obj in ipairs(board:GetDescendants()) do
         if obj:IsA("GuiButton") and obj.Visible then
             pcall(function()
@@ -201,11 +205,15 @@ clearBtn.MouseButton1Click:Connect(function()
 end)
 
 -- === AUTO CLICKER BUTTON ===
+-- === AUTO CLICKER BUTTON ===
 clickerBtn.MouseButton1Click:Connect(function()
     clickerEnabled = not clickerEnabled
     if clickerEnabled then
         clickerBtn.Text = "Auto Clicker: ON"
         clickerBtn.BackgroundColor3 = Color3.fromRGB(30, 120, 40)
+        if clickerConnection then
+            clickerConnection:Disconnect()
+        end
         clickerConnection = game:GetService("RunService").Heartbeat:Connect(function()
             if clickerEnabled then
                 autoClickerLoop()
