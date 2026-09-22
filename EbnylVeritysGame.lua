@@ -6,7 +6,7 @@ local gui = Instance.new("ScreenGui", game.CoreGui)
 gui.Name = "VeritysGameScript_" .. HttpService:GenerateGUID(false)
 
 local mainContainer = Instance.new("Frame", gui)
-mainContainer.Size = UDim2.new(0, 460, 0, 300)
+mainContainer.Size = UDim2.new(0, 420, 0, 260)
 mainContainer.Position = UDim2.new(0.3, 0, 0.3, 0)
 mainContainer.BackgroundTransparency = 1
 mainContainer.Active = true
@@ -47,7 +47,7 @@ title.Size = UDim2.new(1, 0, 1, 0)
 title.BackgroundTransparency = 1
 title.Font = Enum.Font.GothamBold
 title.TextSize = 17
-title.Text = "🙂EBNYL VERITY'S GAME"
+title.Text = "🙂 EBNYL VERITY'S GAME"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.ZIndex = 11
 
@@ -70,58 +70,51 @@ contentFrame.Size = UDim2.new(1, 0, 1, -35)
 contentFrame.Position = UDim2.new(0, 0, 0, 35)
 contentFrame.BackgroundTransparency = 1
 
--- === ЗАГОЛОВОК ФУНКЦИЙ ===
-local funcLabel = Instance.new("TextLabel", contentFrame)
-funcLabel.Size = UDim2.new(1, -20, 0, 20)
-funcLabel.Position = UDim2.new(0, 10, 0, 8)
-funcLabel.BackgroundTransparency = 1
-funcLabel.Font = Enum.Font.GothamBold
-funcLabel.TextSize = 13
-funcLabel.Text = "FUNCTIONS"
-funcLabel.TextColor3 = Color3.fromRGB(200, 180, 220)
-funcLabel.TextXAlignment = Enum.TextXAlignment.Left
-
--- === AUTO FLIPPITY PANEL ===
-local panel = Instance.new("Frame", contentFrame)
-panel.Size = UDim2.new(1, -20, 0, 120)
-panel.Position = UDim2.new(0, 10, 0, 35)
-panel.BackgroundColor3 = Color3.fromRGB(35, 15, 50)
-panel.ZIndex = 5
-local panelCorner = Instance.new("UICorner", panel)
-panelCorner.CornerRadius = UDim.new(0, 10)
-
-local panelTitle = Instance.new("TextLabel", panel)
-panelTitle.Size = UDim2.new(1, 0, 0, 25)
-panelTitle.Position = UDim2.new(0, 0, 0, 5)
-panelTitle.BackgroundTransparency = 1
-panelTitle.Font = Enum.Font.GothamBold
-panelTitle.TextSize = 14
-panelTitle.Text = "Auto Flippity"
-panelTitle.TextColor3 = Color3.fromRGB(255, 220, 255)
+-- === AUTO FLIPPITY LABEL ===
+local sectionLabel = Instance.new("TextLabel", contentFrame)
+sectionLabel.Size = UDim2.new(1, -20, 0, 22)
+sectionLabel.Position = UDim2.new(0, 10, 0, 8)
+sectionLabel.BackgroundTransparency = 1
+sectionLabel.Font = Enum.Font.GothamBold
+sectionLabel.TextSize = 14
+sectionLabel.Text = "Auto Flippity"
+sectionLabel.TextColor3 = Color3.fromRGB(220, 190, 255)
+sectionLabel.TextXAlignment = Enum.TextXAlignment.Left
 
 -- === КНОПКА CLEAR PIPES ===
-local clearBtn = Instance.new("TextButton", panel)
-clearBtn.Size = UDim2.new(1, -20, 0, 35)
-clearBtn.Position = UDim2.new(0, 10, 0, 35)
+local clearBtn = Instance.new("TextButton", contentFrame)
+clearBtn.Size = UDim2.new(1, -20, 0, 45)
+clearBtn.Position = UDim2.new(0, 10, 0, 40)
 clearBtn.BackgroundColor3 = Color3.fromRGB(50, 25, 65)
 clearBtn.Font = Enum.Font.GothamBold
-clearBtn.TextSize = 13
+clearBtn.TextSize = 14
 clearBtn.Text = "Clear Pipes: OFF"
 clearBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 local clearCorner = Instance.new("UICorner", clearBtn)
 clearCorner.CornerRadius = UDim.new(0, 8)
 
 -- === КНОПКА AUTO CLICKER ===
-local clickerBtn = Instance.new("TextButton", panel)
-clickerBtn.Size = UDim2.new(1, -20, 0, 35)
-clickerBtn.Position = UDim2.new(0, 10, 0, 75)
+local clickerBtn = Instance.new("TextButton", contentFrame)
+clickerBtn.Size = UDim2.new(1, -20, 0, 45)
+clickerBtn.Position = UDim2.new(0, 10, 0, 95)
 clickerBtn.BackgroundColor3 = Color3.fromRGB(50, 25, 65)
 clickerBtn.Font = Enum.Font.GothamBold
-clickerBtn.TextSize = 13
-clickerBtn.Text = "Auto Clicker (Need to Clear Pipes): OFF"
+clickerBtn.TextSize = 14
+clickerBtn.Text = "Auto Clicker: OFF"
 clickerBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 local clickerCorner = Instance.new("UICorner", clickerBtn)
 clickerCorner.CornerRadius = UDim.new(0, 8)
+
+-- === СТАТУС ===
+local statusLabel = Instance.new("TextLabel", contentFrame)
+statusLabel.Size = UDim2.new(1, -20, 0, 20)
+statusLabel.Position = UDim2.new(0, 10, 1, -30)
+statusLabel.BackgroundTransparency = 1
+statusLabel.Font = Enum.Font.Gotham
+statusLabel.TextSize = 11
+statusLabel.Text = "Status: idle"
+statusLabel.TextColor3 = Color3.fromRGB(180, 160, 200)
+statusLabel.TextXAlignment = Enum.TextXAlignment.Left
 
 -- === СОСТОЯНИЯ ===
 local clearEnabled = false
@@ -130,7 +123,7 @@ local clearThread = nil
 local clickerEnabled = false
 local clickerConnection = nil
 
--- === ФУНКЦИЯ CLEAR PIPES ===
+-- === CLEAR PIPES LOOP ===
 local function clearPipesLoop()
     while clearEnabled do
         local pg = plr:FindFirstChild("PlayerGui")
@@ -153,7 +146,7 @@ local function clearPipesLoop()
     end
 end
 
--- === ФУНКЦИЯ AUTO CLICKER ===
+-- === AUTO CLICKER LOOP ===
 local function autoClickerLoop()
     local pg = plr:FindFirstChild("PlayerGui")
     if not pg then return end
@@ -180,13 +173,14 @@ local function autoClickerLoop()
     end
 end
 
--- === ОБРАБОТЧИКИ КНОПОК ===
+-- === CLEAR PIPES BUTTON ===
 clearBtn.MouseButton1Click:Connect(function()
     clearEnabled = not clearEnabled
     if clearEnabled then
         clearBtn.Text = "Clear Pipes: ON"
         clearBtn.BackgroundColor3 = Color3.fromRGB(30, 120, 40)
         clearThread = task.spawn(clearPipesLoop)
+        statusLabel.Text = "Status: clearing pipes..."
     else
         clearBtn.Text = "Clear Pipes: OFF"
         clearBtn.BackgroundColor3 = Color3.fromRGB(50, 25, 65)
@@ -194,39 +188,43 @@ clearBtn.MouseButton1Click:Connect(function()
             task.cancel(clearThread)
             clearThread = nil
         end
+        statusLabel.Text = "Status: pipes stopped"
     end
 end)
 
+-- === AUTO CLICKER BUTTON ===
 clickerBtn.MouseButton1Click:Connect(function()
     clickerEnabled = not clickerEnabled
     if clickerEnabled then
-        clickerBtn.Text = "Auto Clicker (Need to Clear Pipes): ON"
+        clickerBtn.Text = "Auto Clicker: ON"
         clickerBtn.BackgroundColor3 = Color3.fromRGB(30, 120, 40)
         clickerConnection = game:GetService("RunService").Heartbeat:Connect(function()
             if clickerEnabled then
                 autoClickerLoop()
             end
         end)
+        statusLabel.Text = "Status: clicking..."
     else
-        clickerBtn.Text = "Auto Clicker (Need to Clear Pipes): OFF"
+        clickerBtn.Text = "Auto Clicker: OFF"
         clickerBtn.BackgroundColor3 = Color3.fromRGB(50, 25, 65)
         if clickerConnection then
             clickerConnection:Disconnect()
             clickerConnection = nil
         end
+        statusLabel.Text = "Status: clicker stopped"
     end
 end)
 
--- === СВОРАЧИВАНИЕ ===
+-- === MINIMIZE ===
 minimizeBtn.MouseButton1Click:Connect(function()
     isMinimized = not isMinimized
     frame.Visible = not isMinimized
     minimizeBtn.Text = isMinimized and "+" or "─"
     if isMinimized then
-        mainContainer.Size = UDim2.new(0, 460, 0, 35)
+        mainContainer.Size = UDim2.new(0, 420, 0, 35)
     else
-        mainContainer.Size = UDim2.new(0, 460, 0, 300)
+        mainContainer.Size = UDim2.new(0, 420, 0, 260)
     end
 end)
 
-print("Ebnyl Verity's Game Script Loaded!")
+print("Verity's Game Script Loaded!")
