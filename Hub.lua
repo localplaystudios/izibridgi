@@ -81,7 +81,7 @@ local scripts = {
     {name = "💥 Ebanniy Fling",  category = "Branded Universal", url = "https://raw.githubusercontent.com/localplaystudios/izibridgi/refs/heads/main/EbanniyFling.lua"},
     {name = "✈ Ebanniy Fly",     category = "Branded Universal", url = "https://raw.githubusercontent.com/localplaystudios/izibridgi/refs/heads/main/EbanniyFly.lua"},
     {name = "🎵 Ebanniy Music",  category = "Branded Universal", url = "https://raw.githubusercontent.com/localplaystudios/izibridgi/refs/heads/main/EbanniyMusic.lua"},
-    {name = "🙂 Ebnyl Verity's Game", category = "Branded Specific", url = "https://github.com/localplaystudios/izibridgi/blob/main/EbnylVeritysGame.lua"},
+    {name = "🙂 Ebnyl Verity's Game", category = "Branded Specific", url = "https://raw.githubusercontent.com/localplaystudios/izibridgi/refs/heads/main/EbnylVeritysGame.lua"},
     {name = "♾ Infinite Yield",  category = "Universal", url = "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"},
     {name = "🔲 Dex Explorer ++",  category = "Universal", url = "https://github.com/AZYsGithub/DexPlusPlus/releases/latest/download/out.lua"},
     {name = "🌐 Goon Esp", category = "Universal", url = "https://raw.githubusercontent.com/LynX99-9/komtolmmek2script/refs/heads/main/CyraaHub.lua"},
