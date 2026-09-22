@@ -169,7 +169,7 @@ local function autoClickerLoop()
     pcall(function()
         local vim = game:GetService("VirtualInputManager")
         vim:SendMouseButtonEvent(cx, cy, 0, true, game, 0)
-        task.wait(0.01)
+        task.wait(1)
         vim:SendMouseButtonEvent(cx, cy, 0, false, game, 0)
     end)
 
