@@ -148,29 +148,16 @@ end
 
 -- === AUTO CLICKER LOOP ===
 local function autoClickerLoop()
-    local pg = plr:FindFirstChild("PlayerGui")
-    if not pg then return end
-    local fg = pg:FindFirstChild("FlappityGui")
-    if not fg then return end
-    local panelObj = fg:FindFirstChild("Panel")
-    if not panelObj then return end
-    local board = panelObj:FindFirstChild("Board")
-    if not board then return end
+    local camera = workspace.CurrentCamera
+    local viewport = camera.ViewportSize
+    local cx = viewport.X / 2
+    local cy = viewport.Y / 2
 
-    for _, obj in ipairs(board:GetDescendants()) do
-        if (obj:IsA("GuiButton")) and obj.Visible then
-            local pos = obj.AbsolutePosition
-            local size = obj.AbsoluteSize
-            local cx = pos.X + size.X / 2
-            local cy = pos.Y + size.Y / 2
-            pcall(function()
-                game:GetService("VirtualInputManager"):SendMouseButtonEvent(cx, cy, 0, true, game, 0)
-                task.wait(0.02)
-                game:GetService("VirtualInputManager"):SendMouseButtonEvent(cx, cy, 0, false, game, 0)
-            end)
-            break
-        end
-    end
+    pcall(function()
+        game:GetService("VirtualInputManager"):SendMouseButtonEvent(cx, cy, 0, true, game, 0)
+        task.wait(0.02)
+        game:GetService("VirtualInputManager"):SendMouseButtonEvent(cx, cy, 0, false, game, 0)
+    end)
 end
 
 -- === CLEAR PIPES BUTTON ===
