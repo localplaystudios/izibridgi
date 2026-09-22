@@ -165,7 +165,7 @@ local function autoClickerLoop()
     -- 1) Виртуальный клик по координатам Board
     pcall(function()
         game:GetService("VirtualInputManager"):SendMouseButtonEvent(cx, cy, 0, true, game, 0)
-        task.wait(0.02)
+        task.wait(1)
         game:GetService("VirtualInputManager"):SendMouseButtonEvent(cx, cy, 0, false, game, 0)
     end)
 
