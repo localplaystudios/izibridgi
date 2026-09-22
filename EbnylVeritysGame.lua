@@ -148,16 +148,37 @@ end
 
 -- === AUTO CLICKER LOOP ===
 local function autoClickerLoop()
-    local camera = workspace.CurrentCamera
-    local viewport = camera.ViewportSize
-    local cx = viewport.X / 2
-    local cy = viewport.Y / 2
+    local pg = plr:FindFirstChild("PlayerGui")
+    if not pg then return end
+    local fg = pg:FindFirstChild("FlappityGui")
+    if not fg then return end
+    local panelObj = fg:FindFirstChild("Panel")
+    if not panelObj then return end
+    local board = panelObj:FindFirstChild("Board")
+    if not board then return end
 
+    local absPos = board.AbsolutePosition
+    local absSize = board.AbsoluteSize
+    local cx = absPos.X + absSize.X / 2
+    local cy = absPos.Y + absSize.Y / 2
+
+    -- 1) Виртуальный клик по координатам Board
     pcall(function()
         game:GetService("VirtualInputManager"):SendMouseButtonEvent(cx, cy, 0, true, game, 0)
         task.wait(0.02)
         game:GetService("VirtualInputManager"):SendMouseButtonEvent(cx, cy, 0, false, game, 0)
     end)
+
+    -- 2) Прямой вызов активации через firesignal (если есть GuiButton)
+    for _, obj in ipairs(board:GetDescendants()) do
+        if obj:IsA("GuiButton") and obj.Visible then
+            pcall(function()
+                if obj.MouseButton1Click then
+                    obj.MouseButton1Click:Fire()
+                end
+            end)
+        end
+    end
 end
 
 -- === CLEAR PIPES BUTTON ===
