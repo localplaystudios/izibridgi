@@ -101,7 +101,7 @@ local scripts = {
     {name = "🔪 Dash Hub MM2", category = "MM2", url = "https://raw.githubusercontent.com/Vax3478/Vax/refs/heads/main/mm2hubdashscript"},
     {name = "🚪 Abysall Hub", category = "DOORS", url = "https://raw.githubusercontent.com/bocaj111004/Abysall/refs/heads/main/Loader.luau"},
     {name = "🚪 MSDOORS (Archives)", category = "DOORS", url = "https://www.msdoors.xyz/script"},
-    {name = "🚪 Abysall Hub (Stairwell + Archives)", category = "DOORS", url = "https://raw.githubusercontent.com/bocaj111004/Abysall/refs/heads/main/Loader.luau"},
+    {name = "🚪 Abysall Hub (Stairwell + Archives)", category = "DOORS", url = "https://raw.githubusercontent.com/therealcookiemonsterof1966/AbysallContinued/main/Games/Doors/Main.luau"},
     {name = "🚪 FourHub", category = "DOORS", url = "https://raw.githubusercontent.com/jokerbiel13/FourHub/refs/heads/main/Doors.lua"},
     {name = "🚪 OrangeHub (Prohax)", category = "DOORS", url = "https://raw.githubusercontent.com/TheHunterSolo1/OrangeHub/refs/heads/main/Rehax.luau"},
     {name = "🚪 BobDoors Hub", category = "DOORS", url = "https://raw.githubusercontent.com/notzanocoddz4/bobdoors/main/main.lua"},
