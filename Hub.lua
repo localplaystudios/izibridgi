@@ -106,7 +106,7 @@ local scripts = {
     {name = "🚪 OrangeHub (Prohax)", category = "DOORS", url = "https://raw.githubusercontent.com/TheHunterSolo1/OrangeHub/refs/heads/main/Rehax.luau"},
     {name = "🚪 BobDoors Hub", category = "DOORS", url = "https://raw.githubusercontent.com/notzanocoddz4/bobdoors/main/main.lua"},
     {name = "🚪 Vynixius Doors", category = "DOORS", url = "https://raw.githubusercontent.com/RegularVynixu/Vynixius/main/Doors/Script.lua"},
-    {name = "🚪 Archives TP (Only for Z-50)", category = "DOORS", url = "https://raw.githubusercontent.com/RegularVynixu/Vynixius/main/Doors/Script.lua"},
+    {name = "🚪 Archives TP (Only for Z-50)", category = "DOORS", url = "https://msdoors-content.pages.dev/ARCHIVESTP"},
 }
 
 -- Собираем категории автоматически
